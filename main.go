@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	if err := godotenv.Load(); err != nil {
+		log.Panicln(err)
+	}
+
+	port := os.Getenv("PORT")
+	runServer(port)
 }

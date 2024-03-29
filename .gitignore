@@ -23,3 +23,6 @@ go.work
 
 # don't store environment variables in github
 .env
+
+# ignore instructions directory - temp offline directory
+instructions/
