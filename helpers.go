@@ -29,6 +29,14 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Write(data)
 }
 
+func decodeRequestParams(r *http.Request, param any) error {
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&param); err != nil {
+		return err
+	}
+	return nil
+}
+
 func reverse[T any](s []T) []T {
 	for i := 0; i < len(s)/2; i++ {
 		temp := s[i]
