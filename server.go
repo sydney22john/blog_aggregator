@@ -14,9 +14,10 @@ func runServer(cfg apiConfig, port string) {
 		Handler: middlewareCors(mux),
 	}
 
-	mux.HandleFunc("/v1/readiness", handlerReadiness)
-	mux.HandleFunc("/v1/err", handlerErr)
-	mux.HandleFunc("/v1/users", cfg.handlerPostUsers)
+	mux.HandleFunc("GET /v1/readiness", handlerReadiness)
+	mux.HandleFunc("GET /v1/err", handlerErr)
+	mux.HandleFunc("POST /v1/users", cfg.handlerPostUsers)
+	mux.HandleFunc("GET /v1/users", cfg.handlerGetUsersByApikey)
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Println(err)

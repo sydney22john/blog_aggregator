@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	_ "github.com/lib/pq"
 )
 
 func (cfg *apiConfig) handlerPostUsers(w http.ResponseWriter, r *http.Request) {
@@ -17,13 +16,13 @@ func (cfg *apiConfig) handlerPostUsers(w http.ResponseWriter, r *http.Request) {
 
 	parameters := params{}
 	if err := decodeRequestParams(r, &parameters); err != nil {
-		respondWithError(w, 500, err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	userUuid, err := uuid.NewRandom()
 	if err != nil {
-		respondWithError(w, 500, err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	ctx := context.Background()
@@ -32,10 +31,10 @@ func (cfg *apiConfig) handlerPostUsers(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Time{},
 		Name:      parameters.Name,
-		ApiKey:    createApiKey(userUuid[:]),
+		ApiKey:    createApiKey(),
 	})
 	if err != nil {
-		respondWithError(w, 500, err.Error())
+		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, user)

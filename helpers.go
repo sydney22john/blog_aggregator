@@ -4,8 +4,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -57,7 +59,16 @@ func contains[T comparable](item T, array []T) bool {
 	return false
 }
 
-func createApiKey(source []byte) string {
-	hash := sha256.Sum256(source)
+func createApiKey() string {
+	b := make([]byte, sha256.BlockSize)
+	hash := sha256.Sum256(b)
 	return hex.EncodeToString(hash[:])
+}
+
+func getHeaderValue(header, prefix string) (value string, err error) {
+	value, found := strings.CutPrefix(header, prefix)
+	if !found {
+		return "", errors.New("failed to retrieve header value")
+	}
+	return value, nil
 }
