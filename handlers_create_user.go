@@ -21,22 +21,22 @@ func (cfg *apiConfig) handlerPostUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uuid, err := uuid.NewRandom()
+	userUuid, err := uuid.NewRandom()
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return
 	}
 	ctx := context.Background()
 	user, err := cfg.DB.CreateUser(ctx, database.CreateUserParams{
-		ID:        uuid,
+		ID:        userUuid,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Time{},
 		Name:      parameters.Name,
+		ApiKey:    createApiKey(userUuid[:]),
 	})
 	if err != nil {
 		respondWithError(w, 500, err.Error())
 		return
 	}
-
 	respondWithJson(w, http.StatusOK, user)
 }

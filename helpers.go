@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -53,4 +55,9 @@ func contains[T comparable](item T, array []T) bool {
 		}
 	}
 	return false
+}
+
+func createApiKey(source []byte) string {
+	hash := sha256.Sum256(source)
+	return hex.EncodeToString(hash[:])
 }
