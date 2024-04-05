@@ -16,8 +16,16 @@ func runServer(cfg apiConfig, port string) {
 
 	mux.HandleFunc("GET /v1/readiness", handlerReadiness)
 	mux.HandleFunc("GET /v1/err", handlerErr)
-	mux.HandleFunc("POST /v1/users", cfg.handlerPostUsers)
-	mux.HandleFunc("GET /v1/users", cfg.handlerGetUsersByApikey)
+
+	mux.HandleFunc("POST /v1/users", cfg.handlerUsersCreate)
+	mux.HandleFunc("GET /v1/users", cfg.authMiddleware(cfg.handlerUsersGet))
+
+	mux.HandleFunc("POST /v1/feeds", cfg.authMiddleware(cfg.handlerFeedsCreate))
+	mux.HandleFunc("GET /v1/feeds", cfg.handlerFeedsAllGet)
+
+	mux.HandleFunc("POST /v1/feed_follows", cfg.authMiddleware(cfg.handlerFeedFollowCreate))
+	mux.HandleFunc("DELETE /v1/feed_follows/{feedFollowId}", cfg.handlerFeedFollowDelete)
+	mux.HandleFunc("GET /v1/feed_follows", cfg.authMiddleware(cfg.handlerFeedFollowGet))
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Println(err)
