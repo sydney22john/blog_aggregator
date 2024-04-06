@@ -5,18 +5,20 @@
 package database
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type Feed struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	UserID    uuid.UUID `json:"user_id"`
-	Url       string    `json:"url"`
-	Name      string    `json:"name"`
+	ID            uuid.UUID    `json:"id"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	UserID        uuid.UUID    `json:"user_id"`
+	Url           string       `json:"url"`
+	Name          string       `json:"name"`
+	LastFetchedAt sql.NullTime `json:"last_fetched_at"`
 }
 
 type User struct {
