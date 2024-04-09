@@ -1,9 +1,15 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"encoding/xml"
 	"io"
+	"log"
 	"net/http"
+	"sjohn/blog_aggregator/internal/database"
+	"sync"
+	"time"
 )
 
 // Rss xml structure
@@ -51,4 +57,46 @@ func getRssData(url string) (Rss, error) {
 		return Rss{}, err
 	}
 	return rss, nil
+}
+
+func (cfg *apiConfig) blogAggregatorWorker(processFeeds int) {
+	var wg sync.WaitGroup
+
+	// TODO wg could potentially panic I believe so set something up to restart the worker function
+	for {
+		log.Println("Worker: getting top 10 feeds from db")
+		feeds, err := cfg.DB.GetNextFeedsToFetch(context.Background(), int32(processFeeds))
+		if err != nil {
+			log.Println(err)
+		}
+
+		// TODO handle goroutine errors with an errors channel
+		log.Println("Worker: starting go routines")
+		for _, feed := range feeds {
+			wg.Add(1)
+			go cfg.aggBlog(&wg, feed)
+		}
+
+		wg.Wait()
+
+		log.Println("Worker: sleeping blog aggregator worker")
+		time.Sleep(time.Second * time.Duration(60))
+	}
+}
+
+func (cfg *apiConfig) aggBlog(wg *sync.WaitGroup, feed database.Feed) error {
+	defer wg.Done()
+
+	log.Println(feed.Name)
+	err := cfg.DB.MarkFeedFetch(context.Background(), database.MarkFeedFetchParams{
+		LastFetchedAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+		ID: feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
 }

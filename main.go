@@ -11,6 +11,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const processFeeds = 10
+
 func main() {
 	randDBValues := flag.Bool("rand-db-values", false, "generate random values in the DB")
 	if *randDBValues {
@@ -35,6 +37,8 @@ func main() {
 	cfg := apiConfig{
 		DB: dbQueries,
 	}
+
+	go cfg.blogAggregatorWorker(processFeeds)
 
 	runServer(cfg, port)
 }
