@@ -8,4 +8,5 @@ SELECT p.*
 FROM posts p
 JOIN users_feeds uf
 ON p.feed_id = uf.feed_id
-WHERE uf.user_id = $1;
+WHERE uf.user_id = $1
+LIMIT $2;
