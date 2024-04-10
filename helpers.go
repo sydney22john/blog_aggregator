@@ -5,9 +5,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -71,4 +73,26 @@ func getHeaderValue(header, prefix string) (value string, err error) {
 		return "", errors.New("failed to retrieve header value")
 	}
 	return value, nil
+}
+
+// most common date layouts to try and parse
+var dateLayouts = [...]string{
+	time.Layout,
+	time.UnixDate,
+	time.ANSIC,
+	time.RFC1123,
+	time.RFC1123Z,
+	time.RFC822,
+	time.RFC822Z,
+	time.RFC850,
+}
+
+func tryParseDate(date string) (time.Time, error) {
+	for _, layout := range dateLayouts {
+		parsedTime, err := time.Parse(layout, date)
+		if err == nil {
+			return parsedTime, nil
+		}
+	}
+	return time.Time{}, errors.New(fmt.Sprintf("unrecogized time format: %s", date))
 }

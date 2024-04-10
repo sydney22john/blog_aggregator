@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const processFeeds = 10
+const processFeeds = 3
 
 func main() {
 	randDBValues := flag.Bool("rand-db-values", false, "generate random values in the DB")
