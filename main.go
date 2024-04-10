@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"flag"
 	"log"
 	"os"
 	"sjohn/blog_aggregator/internal/database"
@@ -14,10 +13,6 @@ import (
 const processFeeds = 3
 
 func main() {
-	randDBValues := flag.Bool("rand-db-values", false, "generate random values in the DB")
-	if *randDBValues {
-		log.Println("TODO later")
-	}
 	if err := godotenv.Load(); err != nil {
 		log.Panicln(err)
 	}

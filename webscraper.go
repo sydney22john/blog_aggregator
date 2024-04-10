@@ -124,14 +124,6 @@ func (cfg *apiConfig) aggBlog(wg *sync.WaitGroup, feed database.Feed, ch chan<- 
 					continue
 				}
 			}
-			switch err {
-			// ignore duplicate errors
-			// TODO: update the entry if I can't insert
-			case sql.ErrNoRows:
-			default:
-				ch <- err
-				continue
-			}
 		}
 	}
 
