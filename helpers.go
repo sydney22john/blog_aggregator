@@ -61,6 +61,14 @@ func contains[T comparable](item T, array []T) bool {
 	return false
 }
 
+func mapArray[T, K any](a []T, f func(T) K) []K {
+	r := make([]K, 0, len(a))
+	for _, elem := range a {
+		r = append(r, f(elem))
+	}
+	return r
+}
+
 func createApiKey() string {
 	b := make([]byte, sha256.BlockSize)
 	hash := sha256.Sum256(b)

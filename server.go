@@ -25,6 +25,8 @@ func runServer(cfg apiConfig, port string) {
 	mux.HandleFunc("DELETE /v1/feed_follows/{feedFollowId}", cfg.handlerFeedFollowDelete)
 	mux.HandleFunc("GET /v1/feed_follows", cfg.authMiddleware(cfg.handlerFeedFollowGet))
 
+	mux.HandleFunc("GET /v1/posts", cfg.authMiddleware(cfg.handlerPostsGet))
+
 	if err := server.ListenAndServe(); err != nil {
 		log.Println(err)
 	}

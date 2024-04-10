@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 // Rss xml structure
@@ -91,7 +92,7 @@ func (cfg *apiConfig) blogAggregatorWorker(processFeeds int) {
 		wg.Wait()
 
 		log.Println("Worker: sleeping blog aggregator worker")
-		time.Sleep(time.Second * time.Duration(10))
+		time.Sleep(time.Second * time.Duration(60))
 	}
 }
 
@@ -108,12 +109,29 @@ func (cfg *apiConfig) aggBlog(wg *sync.WaitGroup, feed database.Feed, ch chan<- 
 		postParams, err := createPostParams(item, feed.ID)
 		if err != nil {
 			ch <- err
-			return
+			continue
 		}
 		_, err = cfg.DB.CreatePost(context.Background(), postParams)
+
 		if err != nil {
-			ch <- err
-			return
+			switch err.(type) {
+			// ignore duplicate key errors
+			case *pq.Error:
+				if err.Error() == "pq: duplicate key value violates unique constraint \"posts_url_key\"" {
+					continue
+				} else {
+					ch <- err
+					continue
+				}
+			}
+			switch err {
+			// ignore duplicate errors
+			// TODO: update the entry if I can't insert
+			case sql.ErrNoRows:
+			default:
+				ch <- err
+				continue
+			}
 		}
 	}
 
