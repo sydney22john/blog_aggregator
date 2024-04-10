@@ -26,3 +26,6 @@ go.work
 
 # ignore instructions directory - temp offline directory
 instructions/
+
+# sensitive file
+.pgpass
